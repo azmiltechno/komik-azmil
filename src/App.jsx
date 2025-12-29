@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import { motion } from 'framer-motion'; // Import jurus rahasia geser-geser
 
 function App() {
   const [loading, setLoading] = useState(false);
@@ -16,16 +17,14 @@ function App() {
   const handleSihir = () => {
     if (!cerita) return alert("Tulis ceritanya dulu dong!");
     
-    mainkanSuara(); // Bunyi POP!
+    mainkanSuara();
     setLoading(true);
 
-    // Pura-pura mikir (Delay 2 detik)
     setTimeout(() => {
-      // Generate 4 gambar acak dari Picsum
       const newImages = Array(4).fill(0).map((_, i) => ({
         id: i,
         url: `https://picsum.photos/400/300?random=${Date.now() + i}`,
-        text: "Halo!" // Teks awal balon kata
+        text: "Halo!"
       }));
       setImages(newImages);
       setLoading(false);
@@ -65,18 +64,24 @@ function App() {
         {/* HASIL GAMBAR */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {images.map((img) => (
-            <div key={img.id} className="relative group bg-white p-2 rounded-2xl shadow-lg border-2 border-gray-100 transform hover:-rotate-1 transition">
+            <div key={img.id} className="relative group bg-white p-2 rounded-2xl shadow-lg border-2 border-gray-100 overflow-hidden">
               {/* Gambar */}
               <img 
                 src={img.url} 
                 alt="Hasil Ajaib" 
-                className="w-full h-64 object-cover rounded-xl"
+                className="w-full h-64 object-cover rounded-xl pointer-events-none" // pointer-events-none biar gambar gak ke-drag
               />
               
-              {/* Balon Kata Sederhana */}
-              <div className="absolute top-4 left-4 bg-white px-3 py-2 rounded-tl-none rounded-2xl border-2 border-black shadow-md cursor-pointer hover:bg-yellow-50">
-                <p className="text-sm font-bold text-black">💬 {img.text}</p>
-              </div>
+              {/* Balon Kata (Sekarang Pakai Motion) */}
+              <motion.div 
+                drag // <--- INI KUNCINYA!
+                dragConstraints={{ left: 0, right: 200, top: 0, bottom: 200 }} // Batas geser (opsional)
+                whileHover={{ scale: 1.1, cursor: 'grab' }}
+                whileTap={{ scale: 0.9, cursor: 'grabbing' }}
+                className="absolute top-4 left-4 bg-white px-3 py-2 rounded-tl-none rounded-2xl border-2 border-black shadow-md"
+              >
+                <p className="text-sm font-bold text-black select-none">💬 {img.text}</p>
+              </motion.div>
             </div>
           ))}
         </div>
